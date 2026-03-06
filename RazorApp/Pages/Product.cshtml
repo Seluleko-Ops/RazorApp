@@ -1,0 +1,350 @@
+﻿@page
+@using RazorApp.Models
+@model RazorApp.Pages.ProductModel
+
+<h3>Products</h3>
+
+<!-- Add Product -->
+<div class="glass-card">
+    <h4>Add Product</h4>
+    <form method="post" enctype="multipart/form-data">
+        <div class="row mb-3">
+            <div class="col">
+                <input asp-for="NewProduct.ProductName" class="form-control" placeholder="Product Name" />
+                <span asp-validation-for="NewProduct.ProductName" class="text-danger"></span>
+            </div>
+            <div class="col">
+                <input asp-for="NewProduct.Stock" class="form-control" placeholder="Stock" />
+                <span asp-validation-for="NewProduct.Stock" class="text-danger"></span>
+            </div>
+            <div class="col">
+                <input type="file" asp-for="NewProductImage" class="form-control" />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success">➕ Add</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<br />
+
+<div class="glass-card">
+    <h4>Product List</h4>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <form method="post" enctype="multipart/form-data">
+                    <td>
+                        @product.ProductID
+                        <input type="hidden" name="EditProduct.ProductID" value="@product.ProductID" />
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(product.ImagePath))
+                        {
+                            <img src="@product.ImagePath" style="width:50px;height:50px;border-radius:8px;" />
+                        }
+                    </td>
+                    <td>
+                        <input type="text" name="EditProduct.ProductName" value="@product.ProductName" class="form-control" disabled />
+                    </td>
+                    <td>
+                        <input type="number" name="EditProduct.Stock" value="@product.Stock" class="form-control" disabled />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-edit btn-sm"
+                                onclick="openEditModal('@product.ProductID', '@product.ProductName', '@product.Stock')">
+                            ✏️ Edit
+                        </button>
+                        <button type="submit" asp-page-handler="Delete" asp-route-id="@product.ProductID" class="btn btn-delete btn-sm">🗑 Delete</button>
+                    </td>
+                    </form>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div id="editModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content glass-card">
+            <h4>Edit Product</h4>
+            <form method="post" enctype="multipart/form-data" id="editForm">
+                <input type="hidden" name="EditProduct.ProductID" id="editProductID" />
+                <div class="mb-3">
+                    <label for="editProductName" class="form-label">Product Name</label>
+                    <input type="text" name="EditProduct.ProductName" id="editProductName" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="editProductStock" class="form-label">Stock</label>
+                    <input type="number" name="EditProduct.Stock" id="editProductStock" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="editProductImage" class="form-label">Image</label>
+                    <input type="file" name="EditProductImage" id="editProductImage" class="form-control" />
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" asp-page-handler="Edit" class="btn btn-edit">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #d9e8ff, #a0b8ff);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2e3a59;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6); /* lighter translucent white */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1.5px solid rgba(169, 196, 255, 0.5); /* soft blue border */
+            box-shadow: 0 8px 24px rgba(160, 180, 255, 0.4);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+
+            .glass-card:hover {
+                transform: translateY(-7px);
+            }
+
+        h4 {
+            color: #3a4f7a;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        input.form-control {
+            background: rgba(224, 233, 255, 0.8);
+            border: 1.5px solid #a0b8ff;
+            border-radius: 10px;
+            color: #2e3a59;
+            font-weight: 600;
+            padding: 0.4rem 0.75rem;
+            transition: border-color 0.3s ease;
+        }
+
+            input.form-control::placeholder {
+                color: #7b8cb9;
+                font-weight: 500;
+            }
+
+            input.form-control:focus {
+                outline: none;
+                border-color: #f3912e; /* orange accent */
+                box-shadow: 0 0 8px #f3912eaa;
+                background: rgba(255, 255, 255, 0.9);
+                color: #1a2a4a;
+            }
+
+        button.btn {
+            background: #f3912e; /* orange */
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 0.45rem 1.25rem;
+            box-shadow: 0 5px 12px #f3912eaa;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+            button.btn:hover,
+            button.btn:focus {
+                background: #d27318;
+                transform: scale(1.05);
+                box-shadow: 0 8px 20px #d2731888;
+                color: #fff;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+        }
+
+        thead tr {
+            background: #aec2ff;
+            color: #21325d;
+            font-weight: 700;
+            border-radius: 18px;
+        }
+
+            thead tr th {
+                padding: 1rem 1.25rem;
+                text-align: left;
+            }
+
+        tbody tr {
+            background: rgba(224, 233, 255, 0.6);
+            color: #21325d;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(147, 145, 143, 0.15);
+        }
+
+            tbody tr td {
+                padding: 1rem 1.25rem;
+                vertical-align: middle;
+            }
+
+            tbody tr:hover {
+                background: rgba(243, 145, 46, 0.15); /* subtle orange highlight */
+                cursor: pointer;
+            }
+
+        img {
+            border-radius: 12px;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            box-shadow: 0 3px 8px rgba(243, 145, 46, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+            img:hover {
+                transform: scale(1.05);
+            }
+
+        /* Action buttons */
+        .btn-warning {
+            background-color: #f3a24e;
+            color: #fff;
+            box-shadow: 0 3px 10px #f3a24eaa;
+        }
+
+            .btn-warning:hover {
+                background-color: #d57d1f;
+                box-shadow: 0 5px 14px #d57d1fbb;
+            }
+
+        .btn-danger {
+            background-color: #f05c4c;
+            color: #fff;
+            box-shadow: 0 3px 10px #f05c4caa;
+        }
+
+            .btn-danger:hover {
+                background-color: #c44131;
+                box-shadow: 0 5px 14px #c44131bb;
+            }
+
+        /* Validation message */
+        .text-danger {
+            font-weight: 600;
+            color: #e85c3c;
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c; /* red */
+            color: white;
+            box-shadow: 0 3px 8px #e74c3caa;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-delete:hover {
+                background-color: #c0392b;
+            }
+
+        .btn-edit {
+            background-color: #3498db; /* blue */
+            color: white;
+            box-shadow: 0 3px 8px #3498dbaa;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-edit:hover {
+                background-color: #2980b9;
+            }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary {
+            background: #ccc;
+            color: #333;
+            border-radius: 12px;
+            padding: 0.45rem 1rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-secondary:hover {
+                background: #bbb;
+            }
+    </style>
+    <script>
+        // Function to open modal and prefill edit form
+        function openEditModal(productId, productName, productStock) {
+            document.getElementById('editProductID').value = productId;
+            document.getElementById('editProductName').value = productName;
+            document.getElementById('editProductStock').value = productStock;
+            document.getElementById('editProductImage').value = ""; // reset file input
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // Close modal function
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Close modal if clicking outside content
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>

@@ -1,0 +1,81 @@
+﻿@page
+@model RazorApp.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="glass-container">
+    <h2 class="mb-4">Create Account</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Input.Email" class="form-label">Email</label>
+            <input asp-for="Input.Email" class="form-control" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Input.Password" class="form-label">Password</label>
+            <input asp-for="Input.Password" type="password" class="form-control" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+            <input asp-for="Input.ConfirmPassword" type="password" class="form-control" />
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-glass">Register</button>
+        <p class="mt-3">Already have an account? <a asp-page="/Account/Login">Login</a></p>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .glass-container {
+        max-width: 400px;
+        margin: 4rem auto;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 20px;
+        border: 1.5px solid rgba(169, 196, 255, 0.5);
+        box-shadow: 0 8px 32px rgba(160, 180, 255, 0.4);
+        color: #2e3a59;
+    }
+
+    .btn-glass {
+        background: linear-gradient(135deg, #a0b8ff, #d9e8ff);
+        color: #2e3a59;
+        font-weight: 600;
+        border: 1px solid rgba(160, 180, 255, 0.5);
+        border-radius: 12px;
+        padding: 0.5rem 1.5rem;
+        box-shadow: 0 4px 16px rgba(160, 180, 255, 0.25);
+        transition: all 0.3s ease;
+    }
+
+        .btn-glass:hover {
+            background: linear-gradient(135deg, #d9e8ff, #a0b8ff);
+            box-shadow: 0 6px 24px rgba(160, 180, 255, 0.35);
+            color: #f3912e; /* orange accent on hover */
+        }
+
+    h2 {
+        color: #2e3a59;
+        text-align: center;
+    }
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+        a:hover {
+            color: #f3912e;
+        }
+</style>
