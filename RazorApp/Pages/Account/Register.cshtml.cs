@@ -24,13 +24,21 @@ namespace RazorApp.Pages.Account
 
         public class RegisterInput
         {
-            [Required, EmailAddress]
+            [Required(ErrorMessage = "Username is required")]
+            public string UserName { get; set; }
+
+            [Required(ErrorMessage = "Email is required")]
+            [EmailAddress(ErrorMessage = "Enter a valid email")]
             public string Email { get; set; }
 
-            [Required, DataType(DataType.Password)]
+            [Required(ErrorMessage = "Password is required")]
+            [DataType(DataType.Password)]
+            [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
             public string Password { get; set; }
 
-            [Required, DataType(DataType.Password), Compare("Password")]
+            [Required(ErrorMessage = "Confirm your password")]
+            [DataType(DataType.Password)]
+            [Compare("Password", ErrorMessage = "Passwords do not match")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -38,7 +46,7 @@ namespace RazorApp.Pages.Account
         {
             if (!ModelState.IsValid) return Page();
 
-            var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+            var user = new ApplicationUser { UserName = Input.UserName, Email = Input.Email };
             var result = await _userManager.CreateAsync(user, Input.Password);
 
             if (result.Succeeded)

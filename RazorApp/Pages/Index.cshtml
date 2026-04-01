@@ -1,17 +1,21 @@
 ﻿@page
 @model RazorApp.Pages.IndexModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+
 @{
     ViewData["Title"] = "Home page";
 }
 
 <div class="container my-5">
-    <h2 class="mb-4 text-center text-glass-title">Items</h2>
     <div class="row g-4">
         @foreach (var product in Model.Products)
         {
+            var modalId = "productModal" + product.ProductID;
+
             <div class="col-md-4">
-                <div class="glass-card p-3 shadow-sm">
-                    <img src="@(string.IsNullOrEmpty(product.ImagePath) ? "/images/placeholder.png" : "/images/" + product.ImagePath)"
+                <div class="glass-card p-3 shadow-sm" onclick="openModal('@modalId')">
+                    <img src="@product.ImagePath"
                          alt="@product.ProductName"
                          class="img-fluid rounded mb-3"
                          style="height:200px; object-fit:cover;" />
@@ -19,33 +23,125 @@
                     <p class="text-glass-stock">In Stock: @product.Stock</p>
                 </div>
             </div>
+
+            <!-- Custom Modal -->
+            <div id="@modalId" class="custom-modal" style="display:none;">
+                <div class="custom-modal-content glass-modal">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@product.ProductName</h5>
+                        <button type="button" class="btn-close" onclick="closeModal('@modalId')"></button>
+                    </div>
+                    <div class="modal-body row">
+                        <div class="col-md-6">
+                            <img src="@product.ImagePath" alt="@product.ProductName" />
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Description:</strong> @product.ProductName</p>
+                            <p><strong>Price:</strong> R @product.Price</p>
+                            <p><strong>In Stock:</strong> @product.Stock</p>
+
+                            @if (User.IsInRole("Client"))
+                            {
+                                <form method="post" asp-page="/Cart/Add">
+                                    <input type="hidden" name="ProductID" value="@product.ProductID" />
+                                    <div class="mb-2">
+                                        <label for="quantity@product.ProductID" class="form-label">Quantity</label>
+                                        <input type="number" class="form-control" id="quantity@product.ProductID"
+                                               name="Quantity" min="1" max="@product.Stock" value="1" required />
+                                    </div>
+                                    <button type="submit" class="btn btn-success mt-2">Buy</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeModal('@modalId')">Close</button>
+                    </div>
+                </div>
+            </div>
         }
     </div>
 </div>
 
 <style>
+    /* Glass Cards */
     .glass-card {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(255,255,255,0.25);
         backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
         border-radius: 20px;
-        border: 1.5px solid rgba(160, 180, 255, 0.4);
-        box-shadow: 0 8px 24px rgba(160, 180, 255, 0.25);
+        border: 1.5px solid rgba(160,180,255,0.4);
+        box-shadow: 0 8px 24px rgba(160,180,255,0.25);
         color: #2e3a59;
+        cursor: pointer;
+        transition: transform 0.2s ease;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
+    .glass-card:hover { transform: translateY(-5px); }
 
-    .text-glass-title {
-        color: #3a4a7a;
-        font-weight: 600;
+    .text-glass-title { color: #3a4a7a; font-weight: 600; }
+    .text-glass-stock { color: #506484; font-weight: 500; }
+
+    /* Custom modal (no overlay, no darkening) */
+    .custom-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1050;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    .text-glass-stock {
-        color: #506484;
-        font-weight: 500;
+    .custom-modal-content {
+        width: 90%;
+        max-width: 700px;
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1.5px solid rgba(160,180,255,0.4);
+        box-shadow: 0 8px 32px rgba(160,180,255,0.4);
+        padding: 1rem;
+        color: #2e3a59;
+        pointer-events: auto; /* allow clicks */
     }
 
+    .custom-modal img {
+        width: 100%;
+        border-radius: 15px;
+        object-fit: cover;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    .btn-success {
+        background-color: #f3912e;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 0.45rem 1.25rem;
+    }
+    .btn-success:hover { background-color: #d27318; }
+
+    .btn-secondary {
+        background-color: #ccc;
+        color: #333;
+        border-radius: 12px;
+        padding: 0.45rem 1rem;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-secondary:hover { background-color: #bbb; }
 </style>
+
+<script>
+    function openModal(id) {
+        document.getElementById(id).style.display = "flex";
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+</script>

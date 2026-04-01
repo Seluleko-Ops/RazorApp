@@ -20,22 +20,48 @@ namespace RazorApp.Pages.Account
 
         public class LoginInput
         {
-            [Required, EmailAddress]
-            public string Email { get; set; }
+            [Required(ErrorMessage = "Enter your username or email")]
+            public required string UserName { get; set; }
 
-            [Required, DataType(DataType.Password)]
-            public string Password { get; set; }
+            [Required(ErrorMessage = "Enter your Password")]
+            [DataType(DataType.Password)]
+            public required string Password { get; set; }
+            public bool RememberMe { get; set; }
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid) return Page();
 
-            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, false, false);
-            if (result.Succeeded)
-                return RedirectToPage("/Index");
+            // Try find by email
+            var user = await _signInManager.UserManager.FindByEmailAsync(Input.UserName);
 
-            ModelState.AddModelError(string.Empty, "Invalid login attempt");
+            // If not email, try username
+            if (user == null)
+            {
+                user = await _signInManager.UserManager.FindByNameAsync(Input.UserName);
+            }
+
+            if (user != null)
+            {
+                var result = await _signInManager.PasswordSignInAsync(
+                    user.UserName,
+                    Input.Password,
+                    Input.RememberMe,
+                    lockoutOnFailure: true
+                );
+
+                if (result.Succeeded)
+                    return RedirectToPage("/Index");
+
+                if (result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, "Account locked. Try again in 5 minutes.");
+                    return Page();
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Invalid username/email or password");
             return Page();
         }
     }

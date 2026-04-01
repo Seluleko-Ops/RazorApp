@@ -7,16 +7,23 @@
 <div class="glass-container">
     <h2 class="mb-4">Login</h2>
     <form method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
         <div class="mb-3">
-            <label asp-for="Input.Email" class="form-label">Email</label>
-            <input asp-for="Input.Email" class="form-control" />
-            <span asp-validation-for="Input.Email" class="text-danger"></span>
+            <label asp-for="Input.UserName" class="form-label">Username</label>
+            <input asp-for="Input.UserName" class="form-control" />
+            <span asp-validation-for="Input.UserName" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Input.Password" class="form-label">Password</label>
             <input asp-for="Input.Password" type="password" class="form-control" />
             <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="Input.RememberMe" class="form-check-input" />
+            <label asp-for="Input.RememberMe" class="form-check-label">Remember Me</label>
         </div>
 
         <button type="submit" class="btn btn-glass">Login</button>

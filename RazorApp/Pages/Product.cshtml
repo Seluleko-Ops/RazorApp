@@ -18,6 +18,10 @@
                 <span asp-validation-for="NewProduct.Stock" class="text-danger"></span>
             </div>
             <div class="col">
+                <input asp-for="NewProduct.Price" class="form-control" placeholder="Price" />
+                <span asp-validation-for="NewProduct.Price" class="text-danger"></span>
+            </div>
+            <div class="col">
                 <input type="file" asp-for="NewProductImage" class="form-control" />
             </div>
             <div class="col-auto">
@@ -34,10 +38,10 @@
     <table class="table table-hover">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Image</th>
                 <th>Name</th>
                 <th>Stock</th>
+                <th>Price</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -45,11 +49,6 @@
             @foreach (var product in Model.Products)
             {
                 <tr>
-                    <form method="post" enctype="multipart/form-data">
-                    <td>
-                        @product.ProductID
-                        <input type="hidden" name="EditProduct.ProductID" value="@product.ProductID" />
-                    </td>
                     <td>
                         @if (!string.IsNullOrEmpty(product.ImagePath))
                         {
@@ -57,19 +56,26 @@
                         }
                     </td>
                     <td>
-                        <input type="text" name="EditProduct.ProductName" value="@product.ProductName" class="form-control" disabled />
+                        <input type="text" value="@product.ProductName" class="form-control" disabled />
                     </td>
                     <td>
-                        <input type="number" name="EditProduct.Stock" value="@product.Stock" class="form-control" disabled />
+                        <input type="number" value="@product.Stock" class="form-control" disabled />
                     </td>
                     <td>
+                        <input type="number" value="@product.Price.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="form-control" disabled />
+                    </td>
+                    <td>
+                        <!-- Edit button triggers modal -->
                         <button type="button" class="btn btn-edit btn-sm"
-                                onclick="openEditModal('@product.ProductID', '@product.ProductName', '@product.Stock')">
+                                onclick="openEditModal('@product.ProductID', '@product.ProductName', '@product.Stock', '@product.Price')">
                             ✏️ Edit
                         </button>
-                        <button type="submit" asp-page-handler="Delete" asp-route-id="@product.ProductID" class="btn btn-delete btn-sm">🗑 Delete</button>
+
+                        <!-- Delete form -->
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@product.ProductID" style="display:inline;">
+                            <button type="submit" class="btn btn-delete btn-sm">🗑 Delete</button>
+                        </form>
                     </td>
-                    </form>
                 </tr>
             }
         </tbody>
@@ -87,6 +93,10 @@
                 <div class="mb-3">
                     <label for="editProductStock" class="form-label">Stock</label>
                     <input type="number" name="EditProduct.Stock" id="editProductStock" class="form-control" required />
+                </div>
+                 <div class="mb-3">
+                    <label for="editProductPrice" class="form-label">Price</label>
+                    <input type="number" name="EditProduct.Price" id="editProductPrice" class="form-control" required />
                 </div>
                 <div class="mb-3">
                     <label for="editProductImage" class="form-label">Image</label>
@@ -326,11 +336,12 @@
     </style>
     <script>
         // Function to open modal and prefill edit form
-        function openEditModal(productId, productName, productStock) {
-            document.getElementById('editProductID').value = productId;
+            function openEditModal(productId, productName, productStock, productPrice) {
+                        document.getElementById('editProductID').value = productId;
             document.getElementById('editProductName').value = productName;
             document.getElementById('editProductStock').value = productStock;
-            document.getElementById('editProductImage').value = ""; // reset file input
+            document.getElementById('editProductPrice').value = productPrice;
+            document.getElementById('editProductImage').value = "";  // reset file input
 
             document.getElementById('editModal').style.display = 'flex';
         }

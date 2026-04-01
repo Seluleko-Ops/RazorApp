@@ -9,7 +9,7 @@ builder.Services.AddRazorPages();
 
 // Configure InMemory database for Identity and App data
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("AppDb"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -19,6 +19,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
     options.Password.RequiredLength = 6;
+
+    //LOCKOUT SETTINGS
+    options.Lockout.MaxFailedAccessAttempts = 3;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
@@ -44,6 +49,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync(); // creates DB automatically if missing
+
     await SeedData(services);
 }
 
@@ -83,11 +92,31 @@ static async Task SeedData(IServiceProvider serviceProvider)
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
     {
-        var user = new ApplicationUser { UserName = adminEmail, Email = adminEmail };
+        var user = new ApplicationUser { UserName = "Admin", Email = adminEmail };
         var result = await userManager.CreateAsync(user, "Admin123!");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(user, "Admin");
+        }
+    }
+
+    var orderAssistantEmail = "assistant@gmail.com";
+    var orderAssistantUser = await userManager.FindByEmailAsync(orderAssistantEmail);
+
+    if (orderAssistantUser == null)
+    {
+        var assistant = new ApplicationUser
+        {
+            UserName = "assistant",
+            Email = orderAssistantEmail
+        };
+        var result = await userManager.CreateAsync(assistant, "Assistant123!");
+        if (result.Succeeded)
+        {
+            if (!await roleManager.RoleExistsAsync("OrderAssistant"))
+                await roleManager.CreateAsync(new IdentityRole("OrderAssistant"));
+
+            await userManager.AddToRoleAsync(assistant, "OrderAssistant");
         }
     }
 }

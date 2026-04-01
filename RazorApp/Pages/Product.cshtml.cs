@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RazorApp.Models;
 
 namespace RazorApp.Pages
 {
+    [Authorize(Roles = "Admin,OrderAssistant")]
     public class ProductModel : PageModel
     {
         private readonly AppDbContext _context;
