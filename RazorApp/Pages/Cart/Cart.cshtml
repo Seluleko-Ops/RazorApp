@@ -1,0 +1,60 @@
+﻿@page
+@model RazorApp.Pages.Cart.CartModel
+
+<h2 class="mb-4">🛒 Your Cart</h2>
+
+@if (Model.Cart == null || !Model.Cart.OrderItems.Any())
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Cart.OrderItems)
+            {
+                <tr>
+                    <td>@item.Product?.ProductName</td>
+                    <td>R @item.Price</td>
+                    <td>
+                        <form method="post" asp-page="/Cart/Update">
+                            <input type="hidden" name="OrderItemID" value="@item.OrderItemID" />
+                            <input type="number" name="Quantity" value="@item.Quantity" min="1" class="form-control" />
+                            <button class="btn btn-sm btn-primary mt-1">Update</button>
+                        </form>
+                    </td>
+                    <td>R @(item.Price* item.Quantity)</td>
+                    <td>
+                        <form method="post" asp-page="/Cart/Delete">
+                            <input type="hidden" name="OrderItemID" value="@item.OrderItemID" />
+                            <button class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>
+        Total: R @Model.Cart.OrderItems.Sum(i => i.Price * i.Quantity)
+    </h4>
+
+    <div class="d-flex justify-content-between mt-3">
+        <form method="post" asp-page="/Cart/Checkout" asp-page-handler="Pay">
+            <button class="btn btn-success">Checkout</button>
+        </form>
+
+        <form method="post" asp-page="/Cart/Clear">
+            <button class="btn btn-warning">Remove All Items</button>
+        </form>
+    </div>
+}

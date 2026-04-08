@@ -1,0 +1,13 @@
+﻿@page
+@model RazorApp.Pages.Cart.SuccessModel
+@{
+    ViewData["Title"] = "Payment Successful";
+}
+
+<div class="container mt-5 text-center">
+    <i class="bi bi-check-circle-fill" style="font-size: 6rem; color: green;"></i>
+    <h2 class="mt-3">Payment Successful!</h2>
+    <p>Thank you for your purchase. Your order has been confirmed.</p>
+
+    <a class="btn btn-primary mt-3" asp-page="/Index">Continue Shopping</a>
+</div>

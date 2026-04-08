@@ -1,0 +1,26 @@
+﻿@page
+@model RazorApp.Pages.Cart.CheckoutModel
+
+<h2>Checkout</h2>
+
+@if (Model.Cart == null)
+{
+    <p>No active cart.</p>
+}
+else
+{
+    <ul>
+        @foreach (var item in Model.Cart.OrderItems)
+        {
+            <li>
+                @item.Product.ProductName - R @item.Price x @item.Quantity
+            </li>
+        }
+    </ul>
+
+    <h3>Total: R @Model.Total</h3>
+
+    <form method="post" asp-page-handler="Pay">
+        <button class="btn btn-success">Pay with PayFast</button>
+    </form>
+}

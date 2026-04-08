@@ -42,7 +42,7 @@
 
                             @if (User.IsInRole("Client"))
                             {
-                                <form method="post" asp-page="/Cart/Add">
+                                <form method="post" asp-page="/Cart/AddToCart">
                                     <input type="hidden" name="ProductID" value="@product.ProductID" />
                                     <div class="mb-2">
                                         <label for="quantity@product.ProductID" class="form-label">Quantity</label>

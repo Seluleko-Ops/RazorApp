@@ -283,6 +283,10 @@
                 <a class="nav-link" asp-page="/Product">Products</a>
             }
 
+            @if (await UserManager.IsInRoleAsync(user, "Client"))
+            {
+                <a class="nav-link" asp-page="/Cart/Cart">Cart</a>
+            }
             <form method="post" asp-page="/Account/Logout" class="mt-3">
                 <button class="btn btn-glass w-100">Logout</button>
             </form>

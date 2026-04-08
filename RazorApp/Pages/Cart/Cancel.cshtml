@@ -1,0 +1,14 @@
+﻿@page
+@model RazorApp.Pages.Cart.CancelModel
+@{
+    ViewData["Title"] = "Payment Failed";
+}
+
+<div class="container mt-5 text-center">
+    <i class="bi bi-x-circle-fill" style="font-size: 6rem; color: red;"></i>
+    <h2 class="mt-3">Payment Failed</h2>
+    <p>Unfortunately, your payment could not be processed.</p>
+    <p>Please check your bank account number or try again.</p>
+
+    <a class="btn btn-primary mt-3" asp-page="/Cart/Cart">Return to Cart</a>
+</div>
